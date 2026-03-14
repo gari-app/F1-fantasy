@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Fantasy – Tomás vs Matías 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --f1-red: #E10600;
+    --f1-dark: #15151E;
+    --f1-panel: #1e1e2e;
+    --f1-card: #252535;
+    --f1-border: #3a3a5c;
+    --f1-accent: #FF8000;
+    --f1-gold: #FFD700;
+    --f1-silver: #C0C0C0;
+    --f1-green: #00D2BE;
+    --tomas-color: #FF8000;
+    --matias-color: #0090FF;
+    --text-primary: #FFFFFF;
+    --text-secondary: #a0a0c0;
+    --font-main: 'Titillium Web', sans-serif;
+    --font-display: 'Orbitron', sans-serif;
+  }
+  body { background: var(--f1-dark); color: var(--text-primary); font-family: var(--font-main); min-height: 100vh; overflow-x: hidden; }
+
+  /* HEADER */
+  .header { background: linear-gradient(135deg, #0a0a12 0%, #15151E 50%, #1a0005 100%); border-bottom: 3px solid var(--f1-red); position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top:0;left:0;right:0;bottom:0; background: repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(255,255,255,0.01) 100px, rgba(255,255,255,0.01) 101px); }
+  .header-inner { max-width: 1400px; margin: 0 auto; padding: 20px 24px 16px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .header-logo { display: flex; align-items: center; gap: 12px; }
+  .f1-badge { background: var(--f1-red); font-family: var(--font-display); font-size: 22px; font-weight: 900; padding: 4px 14px; letter-spacing: 1px; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .header-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-secondary); letter-spacing: 3px; text-transform: uppercase; }
+  .header-season { font-family: var(--font-display); font-size: 11px; color: var(--f1-red); letter-spacing: 2px; }
+  .last-updated { font-size: 11px; color: var(--text-secondary); text-align: right; line-height: 1.6; }
+  .live-dot { display: inline-block; width: 8px; height: 8px; background: var(--f1-green); border-radius: 50%; margin-right: 5px; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* SCOREBOARD */
+  .scoreboard { max-width: 1400px; margin: 0 auto; padding: 24px 24px 0; }
+  .score-cards { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 24px; }
+  .player-card { background: var(--f1-panel); border-radius: 8px; padding: 20px 24px; border: 1px solid var(--f1-border); position: relative; overflow: hidden; }
+  .player-card::before { content: ''; position: absolute; top:0;left:0;right:0; height: 4px; }
+  .player-card.tomas::before { background: var(--tomas-color); }
+  .player-card.matias::before { background: var(--matias-color); }
+  .player-card.leader { border-color: var(--f1-gold); box-shadow: 0 0 20px rgba(255,215,0,0.15); }
+  .player-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .player-card.tomas .player-name { color: var(--tomas-color); }
+  .player-card.matias .player-name { color: var(--matias-color); }
+  .player-score { font-family: var(--font-display); font-size: 52px; font-weight: 900; line-height: 1; margin: 8px 0; }
+  .player-sub { font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; }
+  .leader-badge { position: absolute; top:12px;right:12px; background: var(--f1-gold); color: #000; font-family: var(--font-display); font-size: 9px; font-weight: 700; padding: 3px 8px; letter-spacing: 1px; clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%); }
+  .vs-block { text-align: center; }
+  .vs-text { font-family: var(--font-display); font-size: 28px; font-weight: 900; color: var(--f1-border); }
+
+  /* TABS */
+  .tabs { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+  .tab-bar { display: flex; gap: 0; border-bottom: 1px solid var(--f1-border); margin-bottom: 24px; }
+  .tab-btn { background: none; border: none; color: var(--text-secondary); font-family: var(--font-main); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 12px 20px; cursor: pointer; position: relative; transition: color 0.2s; }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active { color: var(--text-primary); }
+  .tab-btn.active::after { content: ''; position: absolute; bottom: -1px;left:0;right:0; height: 3px; background: var(--f1-red); }
+
+  /* MAIN */
+  .main { max-width: 1400px; margin: 0 auto; padding: 0 24px 40px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* DRIVERS */
+  .section-title { font-family: var(--font-display); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--f1-border); }
+  .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  .player-col h3 { font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 16px; margin-bottom: 12px; border-radius: 4px; }
+  .player-col.tomas h3 { background: rgba(255,128,0,0.15); color: var(--tomas-color); border-left: 3px solid var(--tomas-color); }
+  .player-col.matias h3 { background: rgba(0,144,255,0.15); color: var(--matias-color); border-left: 3px solid var(--matias-color); }
+  .driver-card { background: var(--f1-card); border: 1px solid var(--f1-border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; display: grid; grid-template-columns: 32px 1fr auto auto; align-items: center; gap: 10px; }
+  .sector-num { font-family: var(--font-display); font-size: 10px; font-weight: 700; color: var(--text-secondary); text-align: center; }
+  .driver-name { font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
+  .driver-tags { display: flex; gap: 5px; margin-top: 3px; }
+  .tag { font-size: 9px; font-weight: 700; letter-spacing: 1px; padding: 2px 6px; border-radius: 2px; text-transform: uppercase; }
+  .tag.comodin { background: rgba(255,215,0,0.15); color: var(--f1-gold); border: 1px solid rgba(255,215,0,0.3); }
+  .tag.rezagado { background: rgba(0,210,190,0.15); color: var(--f1-green); border: 1px solid rgba(0,210,190,0.3); }
+  .driver-pts { text-align: right; }
+  .pts-value { font-family: var(--font-display); font-size: 18px; font-weight: 700; line-height: 1; }
+  .pts-label { font-size: 10px; color: var(--text-secondary); letter-spacing: 1px; }
+  .driver-breakdown { font-size: 10px; color: var(--text-secondary); text-align: right; max-width: 80px; }
+
+  /* CALENDAR */
+  .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .race-card { background: var(--f1-card); border: 1px solid var(--f1-border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, transform 0.1s; }
+  .race-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+  .race-card.done { border-color: var(--f1-border); }
+  .race-card.next { border-color: var(--f1-red); box-shadow: 0 0 12px rgba(225,6,0,0.2); }
+  .race-header { padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--f1-border); }
+  .race-round { font-family: var(--font-display); font-size: 10px; font-weight: 700; color: var(--f1-red); letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+  .race-status { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; white-space: nowrap; }
+  .status-done { background: rgba(0,210,190,0.15); color: var(--f1-green); }
+  .status-next { background: rgba(225,6,0,0.2); color: #ff6b6b; }
+  .status-upcoming { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+  .race-body { padding: 10px 12px; }
+  .race-name { font-weight: 700; font-size: 13px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .race-date { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; }
+  .race-has-sprint { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; letter-spacing: 1px; color: var(--f1-accent); background: rgba(255,128,0,0.1); padding: 2px 7px; border-radius: 2px; }
+  .race-pts { margin-top: 8px; display: flex; gap: 8px; }
+  .race-pts-item { flex: 1; text-align: center; background: var(--f1-panel); border-radius: 4px; padding: 5px 4px; }
+  .race-pts-val { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+  .race-pts-label { font-size: 9px; color: var(--text-secondary); letter-spacing: 0.5px; }
+
+  /* MANUAL */
+  .manual-section { background: var(--f1-panel); border: 1px solid var(--f1-border); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .manual-section h3 { font-family: var(--font-display); font-size: 12px; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 5px; }
+  .form-group select, .form-group input { width: 100%; background: var(--f1-dark); border: 1px solid var(--f1-border); border-radius: 4px; color: var(--text-primary); font-family: var(--font-main); font-size: 13px; padding: 7px 10px; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .form-group select:focus, .form-group input:focus { border-color: var(--f1-red); }
+  .form-group select option { background: var(--f1-dark); }
+  .driver-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; align-items: end; background: var(--f1-card); border-radius: 5px; padding: 10px 12px; border: 1px solid var(--f1-border); }
+  .driver-input-label { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .driver-input-label .driver-mod-tag { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-left: 6px; vertical-align: middle; }
+  .driver-input-label .mod-x2 { background: rgba(0,210,190,0.2); color: var(--f1-green); }
+  .driver-input-label .mod-half { background: rgba(255,215,0,0.2); color: var(--f1-gold); }
+  .pos-input-group { display: flex; gap: 6px; align-items: center; }
+  .pos-input-group input[type=number] { flex: 1; min-width: 0; background: var(--f1-dark); border: 1px solid var(--f1-border); border-radius: 4px; color: var(--text-primary); font-family: var(--font-main); font-size: 13px; padding: 6px 8px; outline: none; transition: border-color 0.2s; }
+  .pos-input-group input[type=number]:focus { border-color: var(--f1-red); }
+  .nc-btn { background: var(--f1-dark); border: 1px solid #ff4444; color: #ff4444; border-radius: 4px; font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 6px 10px; cursor: pointer; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+  .nc-btn:hover { background: rgba(255,68,68,0.15); }
+  .nc-btn.active { background: #ff4444; color: #fff; }
+  .btn { background: var(--f1-red); color: #fff; border: none; border-radius: 4px; font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 9px 20px; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .btn:hover { background: #c00400; }
+  .btn:active { transform: scale(0.98); }
+  .btn.secondary { background: var(--f1-border); color: var(--text-secondary); }
+  .btn.secondary:hover { background: #4a4a7a; color: var(--text-primary); }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .results-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  .results-table th { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--f1-border); }
+  .results-table td { padding: 9px 10px; border-bottom: 1px solid rgba(58,58,92,0.4); vertical-align: middle; }
+  .results-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 24px; border-radius: 3px; font-family: var(--font-display); font-size: 11px; font-weight: 700; }
+  .pos-1 { background: var(--f1-gold); color: #000; }
+  .pos-2 { background: var(--f1-silver); color: #000; }
+  .pos-3 { background: #CD7F32; color: #fff; }
+  .pos-nc { background: rgba(255,68,68,0.2); color: #ff6b6b; border: 1px solid rgba(255,68,68,0.4); font-size: 9px; width: 28px; }
+  .pos-other { background: var(--f1-border); color: var(--text-secondary); }
+  .loading-bar { height: 2px; background: var(--f1-red); animation: loading 1.5s ease-in-out infinite; border-radius: 1px; margin-bottom: 8px; }
+  @keyframes loading { 0%{width:0%;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
+  .loading-msg { font-size: 11px; color: var(--text-secondary); text-align: center; padding: 12px; }
+  .error-msg { font-size: 12px; color: #ff6b6b; text-align: center; padding: 12px; background: rgba(225,6,0,0.1); border-radius: 4px; border: 1px solid rgba(225,6,0,0.2); }
+  .notif { position: fixed; bottom: 20px; right: 20px; background: var(--f1-green); color: #000; font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 10px 18px; border-radius: 4px; transform: translateY(60px); opacity: 0; transition: all 0.3s; z-index: 1000; }
+  .notif.show { transform: translateY(0); opacity: 1; }
+  @media (max-width: 768px) {
+    .score-cards { grid-template-columns: 1fr; }
+    .vs-block { display: none; }
+    .players-grid { grid-template-columns: 1fr; }
+    .player-score { font-size: 36px; }
+    .driver-input-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="f1-badge">F1</div>
+      <div>
+        <div class="header-title">Fantasy League</div>
+        <div class="header-season">Temporada 2026</div>
+      </div>
+    </div>
+    <div class="last-updated">
+      <div><span class="live-dot"></span>Actualización automática activa</div>
+      <div id="last-update-time" style="margin-top:2px;">Cargando datos...</div>
+    </div>
+  </div>
+</div>
+
+<div class="scoreboard">
+  <div class="score-cards">
+    <div class="player-card tomas" id="card-tomas">
+      <div class="player-name">Tomás</div>
+      <div class="player-score" id="score-tomas" style="color:var(--tomas-color)">—</div>
+      <div class="player-sub">PUNTOS TOTALES</div>
+    </div>
+    <div class="vs-block">
+      <div class="vs-text">VS</div>
+      <div id="diff-msg" style="font-size:11px;color:var(--text-secondary);margin-top:6px;text-align:center;">...</div>
+    </div>
+    <div class="player-card matias" id="card-matias">
+      <div class="player-name">Matías</div>
+      <div class="player-score" id="score-matias" style="color:var(--matias-color)">—</div>
+      <div class="player-sub">PUNTOS TOTALES</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('drivers')">Drivers</button>
+    <button class="tab-btn" onclick="switchTab('calendar')">Calendario</button>
+    <button class="tab-btn" onclick="switchTab('results')">Resultados</button>
+    <button class="tab-btn" onclick="switchTab('manual')">Entrada Manual</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="tab-panel active" id="tab-drivers">
+    <div class="players-grid">
+      <div class="player-col tomas"><h3>Tomás</h3><div id="drivers-tomas"></div></div>
+      <div class="player-col matias"><h3>Matías</h3><div id="drivers-matias"></div></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-calendar">
+    <div class="section-title">Calendario 2026</div>
+    <div id="loading-calendar" class="loading-msg"><div class="loading-bar"></div>Cargando calendario...</div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+
+  <div class="tab-panel" id="tab-results">
+    <div class="section-title">Historial de Resultados</div>
+    <div id="results-container"><div class="loading-msg">Seleccioná una carrera del calendario para ver el desglose.</div></div>
+  </div>
+
+  <div class="tab-panel" id="tab-manual">
+    <div class="manual-section">
+      <h3>Cargar Resultado Manualmente</h3>
+      <div class="form-row" style="max-width:600px;">
+        <div class="form-group">
+          <label>Gran Premio</label>
+          <select id="m-race"></select>
+        </div>
+        <div class="form-group">
+          <label>Instancia</label>
+          <select id="m-type">
+            <option value="gp">Gran Premio</option>
+            <option value="sprint">Sprint</option>
+          </select>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:14px;letter-spacing:0.5px;">
+        Ingresá la posición de cada driver. Usá <strong style="color:#ff4444;">NC</strong> si no clasificó / abandonó / penalización.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;">
+        <div style="font-family:var(--font-display);font-size:9px;letter-spacing:2px;color:var(--tomas-color);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid rgba(255,128,0,0.3);">Tomás</div>
+        <div style="font-family:var(--font-display);font-size:9px;letter-spacing:2px;color:var(--matias-color);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid rgba(0,144,255,0.3);">Matías</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="manual-drivers-form"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="saveManualResult()">Guardar Resultado</button>
+        <button class="btn secondary" onclick="clearManualForm()">Limpiar</button>
+      </div>
+    </div>
+    <div class="manual-section">
+      <h3>Resultados Guardados</h3>
+      <div id="saved-results-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ===================== PUNTOS F1 =====================
+// GP: top 10 | Sprint: top 8
+const F1_POINTS = {
+  gp:     [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
+  sprint: [8,  7,  6,  5,  4,  3, 2, 1]
+};
+
+// ===================== DRIVERS =====================
+const DRIVERS = {
+  tomas: [
+    { name: 'Verstappen', sector: 1, modifier: 1 },
+    { name: 'Russell',    sector: 2, modifier: 0.5, tag: 'comodin' },
+    { name: 'Leclerc',   sector: 2, modifier: 1 },
+    { name: 'Sainz',     sector: 3, modifier: 1 },
+    { name: 'Hadjar',    sector: 4, modifier: 1 },
+    { name: 'Bortoleto', sector: 5, modifier: 2, tag: 'rezagado' },
+    { name: 'Colapinto', sector: 6, modifier: 2, tag: 'rezagado' },
+  ],
+  matias: [
+    { name: 'Norris',    sector: 1, modifier: 1 },
+    { name: 'Hamilton',  sector: 2, modifier: 0.5, tag: 'comodin' },
+    { name: 'Piastri',   sector: 2, modifier: 1 },
+    { name: 'Antonelli', sector: 3, modifier: 1 },
+    { name: 'Bearman',   sector: 4, modifier: 1 },
+    { name: 'Ocon',      sector: 5, modifier: 2, tag: 'rezagado' },
+    { name: 'Linblad',   sector: 6, modifier: 2, tag: 'rezagado' },
+  ]
+};
+
+const ALL_DRIVERS = [...DRIVERS.tomas, ...DRIVERS.matias];
+const DRIVER_MAP = {};
+ALL_DRIVERS.forEach(d => { DRIVER_MAP[d.name.toLowerCase()] = d; });
+
+// ===================== CALENDARIO 2026 (fallback) =====================
+const CALENDAR_2026_FALLBACK = [
+  { round:'1',  raceName:'Gran Premio de Australia',       shortName:'Australia',      date:'2026-03-15', sprint: false },
+  { round:'2',  raceName:'Gran Premio de China',           shortName:'China',          date:'2026-03-22', sprint: true  },
+  { round:'3',  raceName:'Gran Premio de Japón',           shortName:'Japón',          date:'2026-04-05', sprint: false },
+  { round:'4',  raceName:'Gran Premio de Bahréin',         shortName:'Bahréin',        date:'2026-04-19', sprint: false },
+  { round:'5',  raceName:'Gran Premio de Arabia Saudita',  shortName:'Arabia Saudita', date:'2026-04-26', sprint: false },
+  { round:'6',  raceName:'Gran Premio de Miami',           shortName:'Miami',          date:'2026-05-03', sprint: true  },
+  { round:'7',  raceName:'Gran Premio de Emilia-Romaña',   shortName:'Imola',          date:'2026-05-17', sprint: false },
+  { round:'8',  raceName:'Gran Premio de Mónaco',          shortName:'Mónaco',         date:'2026-05-24', sprint: false },
+  { round:'9',  raceName:'Gran Premio de España',          shortName:'España',         date:'2026-06-07', sprint: false },
+  { round:'10', raceName:'Gran Premio de Canadá',          shortName:'Canadá',         date:'2026-06-14', sprint: false },
+  { round:'11', raceName:'Gran Premio de Austria',         shortName:'Austria',        date:'2026-06-28', sprint: true  },
+  { round:'12', raceName:'Gran Premio de Gran Bretaña',    shortName:'Gran Bretaña',   date:'2026-07-05', sprint: false },
+  { round:'13', raceName:'Gran Premio de Bélgica',         shortName:'Bélgica',        date:'2026-07-26', sprint: true  },
+  { round:'14', raceName:'Gran Premio de Hungría',         shortName:'Hungría',        date:'2026-08-02', sprint: false },
+  { round:'15', raceName:'Gran Premio de Países Bajos',    shortName:'Países Bajos',   date:'2026-08-30', sprint: false },
+  { round:'16', raceName:'Gran Premio de Italia',          shortName:'Italia',         date:'2026-09-06', sprint: false },
+  { round:'17', raceName:'Gran Premio de Azerbaiyán',      shortName:'Azerbaiyán',     date:'2026-09-20', sprint: true  },
+  { round:'18', raceName:'Gran Premio de Singapur',        shortName:'Singapur',       date:'2026-10-04', sprint: false },
+  { round:'19', raceName:'Gran Premio de Estados Unidos',  shortName:'EEUU',           date:'2026-10-18', sprint: true  },
+  { round:'20', raceName:'Gran Premio de México',          shortName:'México',         date:'2026-10-25', sprint: false },
+  { round:'21', raceName:'Gran Premio de Brasil',          shortName:'Brasil',         date:'2026-11-08', sprint: true  },
+  { round:'22', raceName:'Gran Premio de Las Vegas',       shortName:'Las Vegas',      date:'2026-11-21', sprint: false },
+  { round:'23', raceName:'Gran Premio de Qatar',           shortName:'Qatar',          date:'2026-11-29', sprint: true  },
+  { round:'24', raceName:'Gran Premio de Abu Dhabi',       shortName:'Abu Dhabi',      date:'2026-12-06', sprint: false },
+];
+
+// Jolpica driver ID map
+const JOLPICA_IDS = {
+  'verstappen': 'max_verstappen', 'russell': 'george_russell',
+  'leclerc': 'leclerc', 'sainz': 'sainz', 'hadjar': 'hadjar',
+  'bortoleto': 'bortoleto', 'colapinto': 'colapinto',
+  'norris': 'norris', 'hamilton': 'hamilton', 'piastri': 'piastri',
+  'antonelli': 'antonelli', 'bearman': 'bearman',
+  'ocon': 'ocon', 'linblad': 'linblad'
+};
+
+// ===================== STATE =====================
+const STORAGE_KEY = 'f1fantasy_2026_v3';
+let state = { races: [], results: {} };
+
+function loadState() {
+  try { const s = localStorage.getItem(STORAGE_KEY); if (s) state = { ...state, ...JSON.parse(s) }; } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+// ===================== POINTS CALCULATION =====================
+// NC = null or 'NC' → 0 pts. Undefined = not entered → 0 pts.
+function getBasePoints(pos, type) {
+  if (pos === null || pos === 'NC' || pos === undefined) return 0;
+  const arr = F1_POINTS[type] || [];
+  return arr[pos - 1] || 0;
+}
+
+function calcDriverTotalPoints(driver) {
+  let gpBase = 0, sprintBase = 0;
+  Object.keys(state.results).forEach(rk => {
+    const res = state.results[rk];
+    if (rk.endsWith('_gp'))     gpBase     += getBasePoints(res[driver.name], 'gp');
+    if (rk.endsWith('_sprint')) sprintBase += getBasePoints(res[driver.name], 'sprint');
+  });
+  const total = (gpBase + sprintBase) * driver.modifier;
+  return { gp: gpBase, sprint: sprintBase, total: Math.round(total * 10) / 10 };
+}
+
+function calcPlayerTotal(player) {
+  return DRIVERS[player].reduce((s, d) => s + calcDriverTotalPoints(d).total, 0);
+}
+
+function getRaceName(round) {
+  const r = state.races.find(x => String(x.round) === String(round));
+  return r ? (r.shortName || r.raceName) : `Ronda ${round}`;
+}
+
+// ===================== RENDER =====================
+function renderDrivers() {
+  ['tomas', 'matias'].forEach(player => {
+    const ct = document.getElementById('drivers-' + player);
+    ct.innerHTML = '';
+    DRIVERS[player].forEach(driver => {
+      const pts = calcDriverTotalPoints(driver);
+      let tagsHTML = '';
+      if (driver.tag === 'comodin') tagsHTML = `<span class="tag comodin">Comodín ×½</span>`;
+      if (driver.tag === 'rezagado') tagsHTML = `<span class="tag rezagado">×2</span>`;
+      const modLabel = driver.modifier === 2
+        ? '<div style="color:var(--f1-green);font-size:10px;margin-top:2px;">×2</div>'
+        : driver.modifier === 0.5
+        ? '<div style="color:var(--f1-gold);font-size:10px;margin-top:2px;">×½</div>' : '';
+      const card = document.createElement('div');
+      card.className = 'driver-card';
+      card.innerHTML = `
+        <div class="sector-num">S${driver.sector}</div>
+        <div>
+          <div class="driver-name">${driver.name}</div>
+          <div class="driver-tags">${tagsHTML}</div>
+        </div>
+        <div class="driver-breakdown">
+          <div>GP: ${pts.gp} pts</div>
+          <div>Sprint: ${pts.sprint} pts</div>
+          ${modLabel}
+        </div>
+        <div class="driver-pts">
+          <div class="pts-value">${pts.total}</div>
+          <div class="pts-label">pts</div>
+        </div>`;
+      ct.appendChild(card);
+    });
+  });
+}
+
+function renderScoreboard() {
+  const tScore = Math.round(calcPlayerTotal('tomas') * 10) / 10;
+  const mScore = Math.round(calcPlayerTotal('matias') * 10) / 10;
+  document.getElementById('score-tomas').textContent = tScore;
+  document.getElementById('score-matias').textContent = mScore;
+  const ct = document.getElementById('card-tomas');
+  const cm = document.getElementById('card-matias');
+  [ct, cm].forEach(c => { c.classList.remove('leader'); const b = c.querySelector('.leader-badge'); if (b) b.remove(); });
+  if (tScore > mScore) {
+    ct.classList.add('leader');
+    ct.insertAdjacentHTML('beforeend', '<div class="leader-badge">Líder</div>');
+    document.getElementById('diff-msg').textContent = `+${Math.round((tScore - mScore) * 10) / 10} pts`;
+  } else if (mScore > tScore) {
+    cm.classList.add('leader');
+    cm.insertAdjacentHTML('beforeend', '<div class="leader-badge">Líder</div>');
+    document.getElementById('diff-msg').textContent = `+${Math.round((mScore - tScore) * 10) / 10} pts`;
+  } else {
+    document.getElementById('diff-msg').textContent = 'Empate';
+  }
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendar-grid');
+  const loading = document.getElementById('loading-calendar');
+  if (!state.races.length) return;
+  loading.style.display = 'none';
+  grid.innerHTML = '';
+  const today = new Date();
+  let nextFound = false;
+
+  state.races.forEach(race => {
+    const raceDate = new Date(race.date + 'T12:00:00');
+    const gpKey = `r${race.round}_gp`;
+    const sprintKey = `r${race.round}_sprint`;
+    const gpDone = !!state.results[gpKey];
+    const sprintDone = !!state.results[sprintKey];
+    const done = raceDate < today || gpDone;
+    const isNext = !done && !nextFound;
+    if (isNext) nextFound = true;
+
+    let tPts = 0, mPts = 0;
+    if (gpDone) {
+      const res = state.results[gpKey];
+      DRIVERS.tomas.forEach(d => { tPts += getBasePoints(res[d.name], 'gp') * d.modifier; });
+      DRIVERS.matias.forEach(d => { mPts += getBasePoints(res[d.name], 'gp') * d.modifier; });
+    }
+    if (sprintDone) {
+      const res = state.results[sprintKey];
+      DRIVERS.tomas.forEach(d => { tPts += getBasePoints(res[d.name], 'sprint') * d.modifier; });
+      DRIVERS.matias.forEach(d => { mPts += getBasePoints(res[d.name], 'sprint') * d.modifier; });
+    }
+
+    const card = document.createElement('div');
+    card.className = `race-card ${done || gpDone ? 'done' : isNext ? 'next' : 'upcoming'}`;
+    card.onclick = () => showRaceResults(race.round, race.raceName);
+    card.innerHTML = `
+      <div class="race-header">
+        <div class="race-round">${race.shortName || race.raceName}</div>
+        <div class="race-status ${done || gpDone ? 'status-done' : isNext ? 'status-next' : 'status-upcoming'}">
+          ${done || gpDone ? 'Listo' : isNext ? 'Próxima' : 'Próximamente'}
+        </div>
+      </div>
+      <div class="race-body">
+        <div class="race-name">${race.raceName}</div>
+        <div class="race-date">${formatDate(race.date)}</div>
+        ${race.sprint ? '<div class="race-has-sprint">⚡ Sprint</div>' : ''}
+        ${(gpDone || sprintDone) ? `
+        <div class="race-pts">
+          <div class="race-pts-item"><div class="race-pts-val" style="color:var(--tomas-color)">${Math.round(tPts * 10) / 10}</div><div class="race-pts-label">Tomás</div></div>
+          <div class="race-pts-item"><div class="race-pts-val" style="color:var(--matias-color)">${Math.round(mPts * 10) / 10}</div><div class="race-pts-label">Matías</div></div>
+        </div>` : ''}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function showRaceResults(round, raceName) {
+  switchTab('results');
+  const container = document.getElementById('results-container');
+  container.innerHTML = `<div class="section-title" style="margin-bottom:20px;">${raceName}</div>`;
+  let anyResult = false;
+
+  ['gp', 'sprint'].forEach(type => {
+    const key = `r${round}_${type}`;
+    if (!state.results[key]) return;
+    anyResult = true;
+    const res = state.results[key];
+    const label = type === 'gp' ? 'Gran Premio' : 'Sprint';
+
+    let html = `<div style="margin-bottom:24px;">
+      <div style="font-family:var(--font-display);font-size:11px;letter-spacing:2px;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;">${label}</div>
+      <table class="results-table"><thead><tr>
+        <th>Pos</th><th>Driver</th><th>Pts base</th><th>Modificador</th><th>Pts finales</th><th>Jugador</th>
+      </tr></thead><tbody>`;
+
+    const entries = Object.entries(res).sort(([, a], [, b]) => {
+      if (a === null || a === 'NC') return 1;
+      if (b === null || b === 'NC') return -1;
+      return a - b;
+    });
+
+    entries.forEach(([driverName, pos]) => {
+      const d = ALL_DRIVERS.find(x => x.name === driverName);
+      const mod = d ? d.modifier : 1;
+      const isNC = pos === null || pos === 'NC';
+      const base = isNC ? 0 : getBasePoints(pos, type);
+      const final = Math.round(base * mod * 10) / 10;
+      const player = DRIVERS.tomas.find(x => x.name === driverName) ? 'Tomás' : 'Matías';
+      const playerColor = player === 'Tomás' ? 'var(--tomas-color)' : 'var(--matias-color)';
+      const posClass = isNC ? 'pos-nc' : pos === 1 ? 'pos-1' : pos === 2 ? 'pos-2' : pos === 3 ? 'pos-3' : 'pos-other';
+      const posLabel = isNC ? 'NC' : pos;
+      const modLabel = mod === 2 ? '<span style="color:var(--f1-green)">×2</span>' : mod === 0.5 ? '<span style="color:var(--f1-gold)">×½</span>' : '×1';
+      html += `<tr>
+        <td><span class="pos-badge ${posClass}">${posLabel}</span></td>
+        <td style="font-weight:700">${driverName}</td>
+        <td>${isNC ? '<span style="color:#ff6b6b">NC</span>' : base}</td>
+        <td>${modLabel}</td>
+        <td style="font-weight:700;font-family:var(--font-display)">${final}</td>
+        <td style="color:${playerColor};font-weight:600">${player}</td>
+      </tr>`;
+    });
+    html += '</tbody></table></div>';
+    container.insertAdjacentHTML('beforeend', html);
+  });
+
+  if (!anyResult) {
+    container.insertAdjacentHTML('beforeend', '<div class="loading-msg">No hay resultados cargados para esta carrera.</div>');
+  }
+}
+
+// ===================== MANUAL FORM =====================
+const ncState = {};
+
+function buildManualForm() {
+  const sel = document.getElementById('m-race');
+  sel.innerHTML = '';
+  const races = state.races.length ? state.races : CALENDAR_2026_FALLBACK;
+  races.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.round;
+    opt.textContent = r.shortName || r.raceName;
+    sel.appendChild(opt);
+  });
+
+  const form = document.getElementById('manual-drivers-form');
+  form.innerHTML = '';
+  const colT = document.createElement('div');
+  const colM = document.createElement('div');
+  DRIVERS.tomas.forEach(d => colT.appendChild(buildDriverInputRow(d)));
+  DRIVERS.matias.forEach(d => colM.appendChild(buildDriverInputRow(d)));
+  form.appendChild(colT);
+  form.appendChild(colM);
+}
+
+function buildDriverInputRow(driver) {
+  const modTag = driver.modifier === 2
+    ? `<span class="driver-mod-tag mod-x2">×2</span>`
+    : driver.modifier === 0.5
+    ? `<span class="driver-mod-tag mod-half">×½</span>` : '';
+
+  const row = document.createElement('div');
+  row.className = 'driver-input-row';
+  row.innerHTML = `
+    <div>
+      <div class="driver-input-label">${driver.name}${modTag}</div>
+      ${driver.tag ? `<div style="font-size:9px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;">${driver.tag}</div>` : ''}
+    </div>
+    <div class="pos-input-group">
+      <input type="number" id="mpos-${driver.name}" min="1" max="20" placeholder="Pos." oninput="onPosInput('${driver.name}')">
+      <button class="nc-btn" id="ncbtn-${driver.name}" onclick="toggleNC('${driver.name}')">NC</button>
+    </div>`;
+  ncState[driver.name] = false;
+  return row;
+}
+
+function toggleNC(name) {
+  ncState[name] = !ncState[name];
+  const btn = document.getElementById('ncbtn-' + name);
+  const inp = document.getElementById('mpos-' + name);
+  btn.classList.toggle('active', ncState[name]);
+  if (ncState[name]) { inp.value = ''; inp.disabled = true; inp.style.opacity = '0.4'; }
+  else { inp.disabled = false; inp.style.opacity = '1'; }
+}
+
+function onPosInput(name) {
+  if (ncState[name]) {
+    ncState[name] = false;
+    document.getElementById('ncbtn-' + name).classList.remove('active');
+    const inp = document.getElementById('mpos-' + name);
+    inp.disabled = false;
+    inp.style.opacity = '1';
+  }
+}
+
+function saveManualResult() {
+  const round = document.getElementById('m-race').value;
+  const type = document.getElementById('m-type').value;
+  const key = `r${round}_${type}`;
+  const res = {};
+  let hasAny = false;
+  ALL_DRIVERS.forEach(d => {
+    if (ncState[d.name]) {
+      res[d.name] = 'NC';
+      hasAny = true;
+    } else {
+      const val = document.getElementById(`mpos-${d.name}`)?.value;
+      if (val && val.trim() !== '') { res[d.name] = parseInt(val); hasAny = true; }
+    }
+  });
+  if (!hasAny) { showNotif('Ingresá al menos una posición', true); return; }
+  state.results[key] = res;
+  saveState();
+  renderAll();
+  renderSavedResults();
+  showNotif('Resultado guardado ✓');
+}
+
+function clearManualForm() {
+  ALL_DRIVERS.forEach(d => {
+    const inp = document.getElementById(`mpos-${d.name}`);
+    if (inp) { inp.value = ''; inp.disabled = false; inp.style.opacity = '1'; }
+    ncState[d.name] = false;
+    const btn = document.getElementById('ncbtn-' + d.name);
+    if (btn) btn.classList.remove('active');
+  });
+}
+
+function renderSavedResults() {
+  const container = document.getElementById('saved-results-list');
+  const keys = Object.keys(state.results);
+  if (!keys.length) { container.innerHTML = '<div class="loading-msg">No hay resultados guardados.</div>'; return; }
+  let html = '<table class="results-table"><thead><tr><th>GP</th><th>Instancia</th><th>Drivers cargados</th><th></th></tr></thead><tbody>';
+  keys.sort().forEach(k => {
+    const parts = k.match(/^r(\d+)_(gp|sprint)$/);
+    if (!parts) return;
+    const round = parts[1];
+    const type = parts[2] === 'gp' ? 'Gran Premio' : 'Sprint';
+    const gpName = getRaceName(round);
+    const summary = Object.entries(state.results[k])
+      .map(([n, p]) => `${n}: ${p === null || p === 'NC' ? 'NC' : p}`)
+      .join(', ');
+    html += `<tr>
+      <td style="font-weight:700">${gpName}</td>
+      <td style="font-family:var(--font-display);font-size:10px;">${type}</td>
+      <td style="font-size:11px;color:var(--text-secondary);">${summary}</td>
+      <td><button class="btn secondary" style="padding:4px 10px;font-size:9px;" onclick="deleteResult('${k}')">Eliminar</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function deleteResult(key) {
+  if (!confirm(`¿Eliminar resultado "${key}"?`)) return;
+  delete state.results[key];
+  saveState();
+  renderAll();
+  renderSavedResults();
+  showNotif('Resultado eliminado');
+}
+
+// ===================== API =====================
+async function fetchCalendar() {
+  try {
+    const res = await fetch('https://api.jolpi.ca/ergast/f1/2026/races.json');
+    const data = await res.json();
+    const apiRaces = data?.MRData?.RaceTable?.Races;
+    if (apiRaces && apiRaces.length) {
+      state.races = apiRaces.map(r => {
+        const fb = CALENDAR_2026_FALLBACK.find(f => String(f.round) === String(r.round));
+        return {
+          round: r.round,
+          raceName: r.raceName,
+          shortName: fb ? fb.shortName : r.raceName.replace(/Gran Premio (de(l?)|of( the)?)\s*/i, '').trim(),
+          date: r.date,
+          sprint: fb ? !!fb.sprint : false
+        };
+      });
+      saveState();
+    } else {
+      throw new Error('empty');
+    }
+  } catch (e) {
+    if (!state.races.length) { state.races = CALENDAR_2026_FALLBACK; saveState(); }
+  }
+  renderCalendar();
+  buildManualForm();
+  document.getElementById('last-update-time').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-AR');
+}
+
+async function fetchRaceResults(round) {
+  const gpKey = `r${round}_gp`;
+  if (state.results[gpKey]) return;
+  try {
+    const res = await fetch(`https://api.jolpi.ca/ergast/f1/2026/${round}/results.json`);
+    const data = await res.json();
+    const races = data?.MRData?.RaceTable?.Races;
+    if (!races || !races.length) return;
+    const raceRes = {};
+    races[0].Results.forEach(r => {
+      const fam = r.Driver.familyName.toLowerCase();
+      const key = Object.keys(JOLPICA_IDS).find(k => fam.includes(k) || r.Driver.driverId === JOLPICA_IDS[k]);
+      if (key && DRIVER_MAP[key]) {
+        const finishedOk = r.status === 'Finished' || r.status.startsWith('+');
+        raceRes[DRIVER_MAP[key].name] = finishedOk ? parseInt(r.position) : 'NC';
+      }
+    });
+    if (Object.keys(raceRes).length) { state.results[gpKey] = raceRes; saveState(); renderAll(); }
+  } catch (e) {}
+}
+
+async function fetchSprintResults(round) {
+  const sprintKey = `r${round}_sprint`;
+  if (state.results[sprintKey]) return;
+  try {
+    const res = await fetch(`https://api.jolpi.ca/ergast/f1/2026/${round}/sprint.json`);
+    const data = await res.json();
+    const races = data?.MRData?.RaceTable?.Races;
+    if (!races || !races.length) return;
+    const sprintRes = {};
+    races[0].SprintResults.forEach(r => {
+      const fam = r.Driver.familyName.toLowerCase();
+      const key = Object.keys(JOLPICA_IDS).find(k => fam.includes(k) || r.Driver.driverId === JOLPICA_IDS[k]);
+      if (key && DRIVER_MAP[key]) {
+        const finishedOk = r.status === 'Finished' || r.status.startsWith('+');
+        sprintRes[DRIVER_MAP[key].name] = finishedOk ? parseInt(r.position) : 'NC';
+      }
+    });
+    if (Object.keys(sprintRes).length) { state.results[sprintKey] = sprintRes; saveState(); renderAll(); }
+  } catch (e) {}
+}
+
+async function fetchAllPastResults() {
+  const today = new Date();
+  const past = state.races.filter(r => new Date(r.date + 'T12:00:00') < today);
+  for (const race of past) {
+    await fetchRaceResults(race.round);
+    if (race.sprint) await fetchSprintResults(race.round);
+    await sleep(300);
+  }
+  document.getElementById('last-update-time').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-AR');
+}
+
+// ===================== UTILS =====================
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function formatDate(d) { return new Date(d + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' }); }
+function showNotif(msg, isError = false) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.style.background = isError ? '#E10600' : 'var(--f1-green)';
+  n.style.color = isError ? '#fff' : '#000';
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const map = { drivers: 'driver', calendar: 'calendario', results: 'resultado', manual: 'manual' };
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(map[name] || name)) b.classList.add('active');
+  });
+}
+function renderAll() { renderScoreboard(); renderDrivers(); renderCalendar(); }
+
+// ===================== INIT =====================
+async function init() {
+  loadState();
+  if (!state.races.length) { state.races = CALENDAR_2026_FALLBACK; }
+  renderScoreboard();
+  renderDrivers();
+  renderCalendar();
+  buildManualForm();
+  renderSavedResults();
+  await fetchCalendar();
+  await fetchAllPastResults();
+  renderAll();
+  // Auto-refresh every 5 minutes
+  setInterval(async () => { await fetchCalendar(); await fetchAllPastResults(); }, 5 * 60 * 1000);
+}
+
+init();
+</script>
+</body>
+</html>
